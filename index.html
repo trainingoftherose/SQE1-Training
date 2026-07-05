@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>SQE1 Practice</title>
+<style>
+  :root {
+    --bg: #ffffff; --bg2: #f5f5f4; --bg3: #efede8;
+    --info-bg:#e6f1fb; --info-tx:#0c447c; --info-bd:#85b7eb;
+    --ok-bg:#eaf3de; --ok-tx:#27500a; --ok-bd:#97c459;
+    --warn-bg:#faeeda; --warn-tx:#633806; --warn-bd:#ef9f27;
+    --err-bg:#fcebeb; --err-tx:#791f1f; --err-bd:#f09595;
+    --tx:#1a1a18; --tx2:#6b6b66; --tx3:#9a9a94;
+    --bd:rgba(26,26,24,0.15); --bd2:rgba(26,26,24,0.3); --bd3:rgba(26,26,24,0.42);
+    --r:8px; --r2:12px;
+    --font:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#1c1c1a; --bg2:#262624; --bg3:#2c2c2a;
+      --info-bg:#042c53; --info-tx:#b5d4f4; --info-bd:#185fa5;
+      --ok-bg:#173404; --ok-tx:#c0dd97; --ok-bd:#3b6d11;
+      --warn-bg:#412402; --warn-tx:#fac775; --warn-bd:#854f0b;
+      --err-bg:#501313; --err-tx:#f7c1c1; --err-bd:#a32d2d;
+      --tx:#f0ede8; --tx2:#a0a09a; --tx3:#6b6b66;
+      --bd:rgba(240,237,232,0.15); --bd2:rgba(240,237,232,0.3); --bd3:rgba(240,237,232,0.42);
+    }
+  }
+  * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body { background:var(--bg); color:var(--tx); font-family:var(--font); font-size:16px; -webkit-text-size-adjust:100%; }
+  body { padding:16px; padding-bottom:64px; max-width:820px; margin:0 auto; }
+  .hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:14px; border-bottom:0.5px solid var(--bd); }
+  .hdr h1 { font-size:19px; font-weight:600; }
+  .badge { font-size:12px; font-weight:500; padding:3px 9px; border-radius:var(--r); background:var(--info-bg); color:var(--info-tx); }
+  .screen { display:none; } .screen.active { display:block; }
+  .sec { font-size:12px; font-weight:600; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:11px; margin-top:4px; }
+  button { cursor:pointer; border:0.5px solid var(--bd2); background:transparent; color:var(--tx); border-radius:var(--r); padding:11px 16px; font-size:15px; font-family:var(--font); transition:background .12s; min-height:44px; }
+  button:active { background:var(--bg2); }
+  button.pri { background:var(--tx); color:var(--bg); border-color:var(--tx); font-weight:500; }
+  button:disabled { opacity:.4; cursor:not-allowed; }
+  button.danger { color:var(--err-tx); border-color:var(--err-bd); }
+  button.sm { padding:7px 11px; font-size:13px; min-height:0; }
+  select { background:var(--bg); color:var(--tx); border:0.5px solid var(--bd2); border-radius:var(--r); padding:11px 12px; font-size:15px; font-family:var(--font); min-height:44px; -webkit-appearance:none; appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6b66' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; padding-right:34px; }
+  .row { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:16px; }
+  .bank-list { display:flex; flex-direction:column; gap:8px; margin-bottom:18px; }
+  .bank-card { display:flex; align-items:center; gap:12px; background:var(--bg); border:0.5px solid var(--bd); border-radius:var(--r2); padding:14px 15px; cursor:pointer; }
+  .bank-card.sel { border:1.5px solid var(--info-bd); background:var(--info-bg); }
+  .bank-check { width:22px; height:22px; border-radius:6px; border:1.5px solid var(--bd2); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; color:transparent; }
+  .bank-card.sel .bank-check { background:var(--info-tx); border-color:var(--info-tx); color:var(--bg); }
+  .bank-info { flex:1; min-width:0; }
+  .bank-name { font-size:15px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bank-meta { font-size:13px; color:var(--tx2); margin-top:1px; }
+  .bank-card.sel .bank-name, .bank-card.sel .bank-meta { color:var(--info-tx); }
+  .mode-row { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:18px; }
+  .mode-card { border:0.5px solid var(--bd); border-radius:var(--r2); padding:14px; cursor:pointer; }
+  .mode-card.sel { border:1.5px solid var(--info-bd); background:var(--info-bg); }
+  .mode-card .mt { font-size:15px; font-weight:600; }
+  .mode-card .md { font-size:13px; color:var(--tx2); margin-top:4px; line-height:1.45; }
+  .mode-card.sel .mt, .mode-card.sel .md { color:var(--info-tx); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:16px; }
+  .prog-bar { height:4px; background:var(--bg2); border-radius:2px; margin-bottom:18px; overflow:hidden; }
+  .prog-fill { height:100%; background:var(--tx); border-radius:2px; transition:width .3s; width:0; }
+  .q-meta { display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .q-num { font-size:14px; color:var(--tx2); font-weight:500; }
+  .chip { font-size:12px; padding:3px 9px; border-radius:var(--r); background:var(--bg2); color:var(--tx2); }
+  .chip.mode-study { background:var(--info-bg); color:var(--info-tx); }
+  .chip.mode-exam { background:var(--warn-bg); color:var(--warn-tx); }
+  .scenario { font-size:15px; line-height:1.65; background:var(--bg2); padding:14px 16px; margin-bottom:16px; border-left:3px solid var(--bd2); border-radius:2px; }
+  .stem { font-size:17px; font-weight:600; margin-bottom:16px; line-height:1.45; }
+  .opts { display:flex; flex-direction:column; gap:9px; margin-bottom:20px; }
+  .opt { display:flex; align-items:flex-start; gap:11px; padding:13px 15px; border:0.5px solid var(--bd); border-radius:var(--r2); cursor:pointer; font-size:15px; line-height:1.5; transition:border-color .1s, background .1s; }
+  .opt:active:not(.dis) { background:var(--bg2); }
+  .opt .ol { font-weight:600; min-width:20px; color:var(--tx2); }
+  .opt.picked { border-color:var(--bd2); background:var(--bg2); }
+  .opt.correct { border-color:var(--ok-bd)!important; background:var(--ok-bg)!important; }
+  .opt.correct .ol { color:var(--ok-tx); }
+  .opt.wrong { border-color:var(--err-bd)!important; background:var(--err-bg)!important; }
+  .opt.wrong .ol { color:var(--err-tx); }
+  .opt.dis { cursor:default; }
+  .exp { font-size:14px; line-height:1.65; border:0.5px solid var(--bd); border-radius:var(--r2); padding:14px 16px; margin-bottom:20px; }
+  .exp-lbl { font-size:12px; font-weight:600; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+  .q-nav { display:flex; gap:9px; }
+  .q-nav button { flex:1; }
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px; }
+  .stat { background:var(--bg2); border-radius:var(--r); padding:14px 8px; text-align:center; }
+  .sv { font-size:23px; font-weight:600; } .sl { font-size:12px; color:var(--tx2); margin-top:3px; }
+  .bd-list { display:flex; flex-direction:column; gap:9px; margin-bottom:20px; }
+  .bd-item { display:flex; align-items:center; gap:10px; font-size:14px; }
+  .bd-bg { flex:1; height:6px; background:var(--bg2); border-radius:3px; overflow:hidden; }
+  .bd-bar { height:100%; background:var(--tx); border-radius:3px; }
+  .bd-pct { min-width:38px; text-align:right; color:var(--tx2); font-size:13px; }
+  .review-item { margin-bottom:20px; padding-bottom:20px; border-bottom:0.5px solid var(--bd); }
+  .info-box { font-size:14px; line-height:1.6; color:var(--tx2); background:var(--bg2); border-radius:var(--r); padding:13px 15px; margin-bottom:16px; }
+  .empty { text-align:center; padding:40px 16px; color:var(--tx2); font-size:15px; line-height:1.6; }
+  .toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--tx); color:var(--bg); padding:12px 20px; border-radius:var(--r); font-size:14px; z-index:100; max-width:90%; box-shadow:0 4px 16px rgba(0,0,0,.2); opacity:0; transition:opacity .2s; pointer-events:none; }
+  .toast.show { opacity:1; }
+  .file-btn { position:relative; overflow:hidden; display:inline-block; }
+  .file-btn input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; font-size:0; }
+  a { color:var(--info-tx); }
+  .hint { font-size:13px; color:var(--tx3); line-height:1.55; margin-top:8px; }
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>SQE1 Practice</h1>
+  <span class="badge" id="total-badge">0 questions</span>
+</div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="sec">Question banks</div>
+  <div id="bank-list" class="bank-list"></div>
+  <div class="row" style="margin-top:-6px">
+    <button class="sm" onclick="selectAllBanks(true)">Select all</button>
+    <button class="sm" onclick="selectAllBanks(false)">Clear</button>
+    <span class="hint" id="selection-hint" style="margin:0"></span>
+  </div>
+
+  <div class="sec">Mode</div>
+  <div class="mode-row">
+    <div class="mode-card sel" id="mc-study" onclick="setMode('study')">
+      <div class="mt">Study</div>
+      <div class="md">Instant feedback and explanation after each question.</div>
+    </div>
+    <div class="mode-card" id="mc-exam" onclick="setMode('exam')">
+      <div class="mt">Exam</div>
+      <div class="md">No feedback until the end, then a full review.</div>
+    </div>
+  </div>
+
+  <div class="sec">Session</div>
+  <div class="grid2">
+    <select id="sel-count">
+      <option value="10">10 questions</option>
+      <option value="20" selected>20 questions</option>
+      <option value="30">30 questions</option>
+      <option value="50">50 questions</option>
+      <option value="all">All available</option>
+    </select>
+    <select id="sel-order">
+      <option value="random">Random order</option>
+      <option value="weak">Weakest first</option>
+      <option value="unseen">Unseen only</option>
+    </select>
+  </div>
+  <button class="pri" style="width:100%" onclick="startSession()">Start session</button>
+
+  <div class="sec" style="margin-top:24px">Recent sessions</div>
+  <div id="recent"></div>
+
+  <div class="sec" style="margin-top:24px">Manage</div>
+  <div class="row">
+    <button class="sm" id="refresh-btn" onclick="refreshFromLibrary()">Refresh from library</button>
+    <span class="file-btn"><button class="sm">Import bank(s)</button><input type="file" accept=".json,application/json" multiple onchange="onImport(event)"></span>
+    <button class="sm" onclick="exportBackup()">Export backup</button>
+    <span class="file-btn"><button class="sm">Restore backup</button><input type="file" accept=".json,application/json" onchange="onRestore(event)"></span>
+    <button class="sm danger" onclick="wipeAll()">Clear all</button>
+  </div>
+  <div class="hint">When hosted online, banks listed in <code>manifest.json</code> load automatically, and <strong>Refresh from library</strong> pulls in any questions you've since added to those files. You can also <strong>Import</strong> <code>.json</code> banks manually from your device. Progress is saved on this device; use <strong>Export backup</strong> to move it between devices.</div>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+  <div class="q-meta">
+    <span class="q-num" id="qnum"></span>
+    <span class="chip" id="qbank"></span>
+    <span class="chip" id="qmode"></span>
+  </div>
+  <div class="scenario" id="qscenario"></div>
+  <div class="stem" id="qstem"></div>
+  <div class="opts" id="qopts"></div>
+  <div class="exp" id="qexp" style="display:none">
+    <div class="exp-lbl">Explanation</div>
+    <div id="qexptext"></div>
+  </div>
+  <div class="q-nav">
+    <button onclick="quitSession()">Quit</button>
+    <button class="pri" id="nextbtn" onclick="nextQuestion()" disabled>Next</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="sec">Session results</div>
+  <div class="stats">
+    <div class="stat"><div class="sv" id="r-score">—</div><div class="sl">Score</div></div>
+    <div class="stat"><div class="sv" id="r-correct">—</div><div class="sl">Correct</div></div>
+    <div class="stat"><div class="sv" id="r-total">—</div><div class="sl">Total</div></div>
+    <div class="stat"><div class="sv" id="r-avg">—</div><div class="sl">All-time</div></div>
+  </div>
+  <div class="sec">By module</div>
+  <div class="bd-list" id="r-breakdown"></div>
+  <div class="q-nav">
+    <button class="pri" onclick="goHome()">Done</button>
+    <button onclick="showReview()">Review answers</button>
+  </div>
+</div>
+
+<!-- REVIEW -->
+<div id="screen-review" class="screen">
+  <div class="sec">Answer review</div>
+  <div id="review-list"></div>
+  <button style="width:100%;margin-top:8px" onclick="show('results')">Back to results</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const LS_KEY = 'sqe1_bank_v1';
+const LETTERS = ['A','B','C','D','E'];
+
+let state = { questions: [], banks: [], sessions: [] };
+let ui = { selectedBanks: {}, mode: 'study' };
+let quiz = null;
+
+// ---------- persistence ----------
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  catch(e) { toast('Could not save — storage may be full'); }
+}
+function restore() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) { const d = JSON.parse(raw); state.questions=d.questions||[]; state.banks=d.banks||[]; state.sessions=d.sessions||[]; }
+  } catch(e) {}
+}
+
+// ---------- core logic (mirrors tested logic.js) ----------
+function ingestBank(fileName, rawText) {
+  const result = { loaded:0, skipped:0, errors:[] };
+  let parsed;
+  try { parsed = JSON.parse(rawText); }
+  catch(e) { result.errors.push(fileName+': invalid JSON — '+e.message); return result; }
+  if (!Array.isArray(parsed)) { result.errors.push(fileName+': root must be a JSON array'); return result; }
+  const bankId = fileName.replace(/\.json$/i,'');
+  for (const q of parsed) {
+    const required = ['id','module','stem','options','correct','explanation'];
+    const missing = required.filter(k => !(k in q));
+    if (missing.length) { result.errors.push(fileName+': a question is missing '+missing.join(', ')); continue; }
+    if (typeof q.id !== 'string' || typeof q.module !== 'string' || typeof q.stem !== 'string' || typeof q.explanation !== 'string') { result.errors.push(fileName+': '+(q.id||'?')+' id, module, stem and explanation must all be text strings'); continue; }
+    if (q.scenario != null && typeof q.scenario !== 'string') { result.errors.push(fileName+': '+q.id+' scenario must be a text string'); continue; }
+    if (!Array.isArray(q.options) || q.options.length !== 5 || !q.options.every(o => typeof o === 'string')) { result.errors.push(fileName+': '+q.id+' must have exactly 5 options, all text strings'); continue; }
+    if (!Number.isInteger(q.correct) || q.correct < 0 || q.correct > 4) { result.errors.push(fileName+': '+q.id+" 'correct' must be an integer 0-4"); continue; }
+    if (state.questions.some(e => e.id === q.id)) { result.skipped++; continue; }
+    state.questions.push({ id:q.id, module:q.module, scenario:q.scenario||'', stem:q.stem, options:q.options, correct:q.correct, explanation:q.explanation, bank:bankId });
+    result.loaded++;
+  }
+  if (!state.banks.includes(bankId) && result.loaded > 0) state.banks.push(bankId);
+  return result;
+}
+function bankCounts() {
+  const c = {}; state.questions.forEach(q => c[q.bank]=(c[q.bank]||0)+1); return c;
+}
+function buildPool(selectedBanks, order, count) {
+  let pool = state.questions.filter(q => !selectedBanks || selectedBanks.length===0 || selectedBanks.includes(q.bank));
+  if (order === 'unseen') {
+    const seen = new Set(state.sessions.flatMap(s => s.answers.map(a => a.id)));
+    pool = pool.filter(q => !seen.has(q.id));
+  } else if (order === 'weak') {
+    const st = {};
+    state.sessions.forEach(s => s.answers.forEach(a => { if(!st[a.id]) st[a.id]={t:0,c:0}; st[a.id].t++; if(a.correct) st[a.id].c++; }));
+    pool = pool.slice().sort((a,b) => {
+      const sa = st[a.id]? st[a.id].c/st[a.id].t : 0;
+      const sb = st[b.id]? st[b.id].c/st[b.id].t : 0;
+      return sa - sb;
+    });
+  } else {
+    pool = pool.slice().sort(() => Math.random() - 0.5);
+  }
+  const n = count === 'all' ? pool.length : Math.min(parseInt(count), pool.length);
+  return pool.slice(0, n);
+}
+function scoreSession(answers) {
+  const total = answers.length;
+  const correct = answers.filter(a => a.correct).length;
+  const byModule = {};
+  answers.forEach(a => { if(!byModule[a.module]) byModule[a.module]={c:0,t:0}; byModule[a.module].t++; if(a.correct) byModule[a.module].c++; });
+  return { score: total? Math.round(correct/total*100):0, correct, total, byModule };
+}
+
+// ---------- UI helpers ----------
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// ---------- home rendering ----------
+function renderHome() {
+  document.getElementById('total-badge').textContent = state.questions.length + (state.questions.length===1?' question':' questions');
+  const counts = bankCounts();
+  const list = document.getElementById('bank-list');
+  if (state.banks.length === 0) {
+    list.innerHTML = '<div class="empty">No question banks yet.<br>Tap <strong>Import bank(s)</strong> below to load one or more <code>.json</code> files.</div>';
+  } else {
+    // default: all selected
+    state.banks.forEach(b => { if (!(b in ui.selectedBanks)) ui.selectedBanks[b] = true; });
+    list.innerHTML = state.banks.map(b => {
+      const perf = bankPerf(b);
+      return '<div class="bank-card'+(ui.selectedBanks[b]?' sel':'')+'" onclick="toggleBank(\''+esc(b).replace(/'/g,"\\'")+'\')">'
+        + '<div class="bank-check">✓</div>'
+        + '<div class="bank-info"><div class="bank-name">'+esc(b)+'</div>'
+        + '<div class="bank-meta">'+(counts[b]||0)+' questions'+(perf!==null?' · '+perf+'% correct':'')+'</div></div>'
+        + '</div>';
+    }).join('');
+  }
+  updateSelectionHint();
+  renderRecent();
+}
+function bankPerf(bank) {
+  let t=0,c=0;
+  state.sessions.forEach(s => s.answers.forEach(a => { if(a.bank===bank){ t++; if(a.correct) c++; } }));
+  return t? Math.round(c/t*100) : null;
+}
+function updateSelectionHint() {
+  const sel = state.banks.filter(b => ui.selectedBanks[b]);
+  const hint = document.getElementById('selection-hint');
+  if (state.banks.length === 0) { hint.textContent=''; return; }
+  if (sel.length === state.banks.length) hint.textContent = 'Full review — all banks';
+  else if (sel.length === 0) hint.textContent = 'No bank selected';
+  else if (sel.length === 1) hint.textContent = 'Studying: ' + sel[0];
+  else hint.textContent = sel.length + ' banks selected';
+}
+function toggleBank(b) { ui.selectedBanks[b] = !ui.selectedBanks[b]; renderHome(); }
+function selectAllBanks(v) { state.banks.forEach(b => ui.selectedBanks[b]=v); renderHome(); }
+function setMode(m) {
+  ui.mode = m;
+  document.getElementById('mc-study').classList.toggle('sel', m==='study');
+  document.getElementById('mc-exam').classList.toggle('sel', m==='exam');
+}
+function renderRecent() {
+  const box = document.getElementById('recent');
+  const recent = state.sessions.slice(-6).reverse();
+  if (!recent.length) { box.innerHTML = '<div class="hint" style="margin:0">No sessions yet.</div>'; return; }
+  box.innerHTML = recent.map(s => {
+    const pct = Math.round(s.correct/s.total*100);
+    const col = pct>=70?'var(--ok-tx)':pct>=50?'var(--warn-tx)':'var(--err-tx)';
+    const d = new Date(s.date).toLocaleDateString(undefined,{day:'numeric',month:'short'});
+    const modeChip = s.mode==='exam'?'<span class="chip mode-exam" style="margin-right:6px">exam</span>':'<span class="chip mode-study" style="margin-right:6px">study</span>';
+    const scope = s.scope || 'all';
+    return '<div style="display:flex;align-items:center;gap:9px;font-size:14px;padding:7px 0;border-bottom:0.5px solid var(--bd)">'
+      + modeChip
+      + '<span style="color:var(--tx2);min-width:52px">'+d+'</span>'
+      + '<span style="flex:1;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(scope)+'</span>'
+      + '<span style="font-weight:600;color:'+col+'">'+pct+'%</span>'
+      + '<span style="color:var(--tx2);min-width:44px;text-align:right">'+s.correct+'/'+s.total+'</span>'
+      + '</div>';
+  }).join('');
+}
+
+// ---------- import / export ----------
+function onImport(ev) {
+  const files = Array.from(ev.target.files||[]);
+  if (!files.length) return;
+  let totalLoaded=0, totalSkipped=0, allErrors=[], done=0;
+  function finish() {
+    done++;
+    if (done !== files.length) return;
+    persist(); renderHome();
+    let msg = 'Imported '+totalLoaded+' question'+(totalLoaded===1?'':'s');
+    if (totalSkipped) msg += ', skipped '+totalSkipped+' duplicate'+(totalSkipped===1?'':'s');
+    toast(msg);
+    if (allErrors.length) { console.warn('Import issues:', allErrors); setTimeout(()=>toast(allErrors.length+' issue(s): '+allErrors[0]), 2800); }
+  }
+  files.forEach(f => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const res = ingestBank(f.name, e.target.result);
+      totalLoaded += res.loaded; totalSkipped += res.skipped; allErrors = allErrors.concat(res.errors);
+      finish();
+    };
+    reader.onerror = () => { allErrors.push('Could not read '+f.name); finish(); };
+    reader.readAsText(f);
+  });
+  ev.target.value='';
+}
+function exportBackup() {
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'sqe1_backup_'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  toast('Backup exported');
+}
+function onRestore(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (!d.questions || !d.banks || !d.sessions) throw new Error('Not a valid backup file');
+      state = { questions:d.questions, banks:d.banks, sessions:d.sessions };
+      ui.selectedBanks = {};
+      persist(); renderHome();
+      toast('Backup restored — '+state.questions.length+' questions');
+    } catch(err) { toast('Restore failed: '+err.message); }
+  };
+  reader.readAsText(f);
+  ev.target.value='';
+}
+function wipeAll() {
+  if (!confirm('Delete all banks, questions and session history on this device? Export a backup first if you want to keep them.')) return;
+  state = { questions:[], banks:[], sessions:[] };
+  ui.selectedBanks = {};
+  persist(); renderHome();
+  toast('All data cleared');
+}
+
+// ---------- quiz flow ----------
+function startSession() {
+  const selected = state.banks.filter(b => ui.selectedBanks[b]);
+  if (state.questions.length === 0) { toast('Import a question bank first'); return; }
+  if (selected.length === 0) { toast('Select at least one bank'); return; }
+  const order = document.getElementById('sel-order').value;
+  const count = document.getElementById('sel-count').value;
+  const pool = buildPool(selected, order, count);
+  if (pool.length === 0) {
+    if (order==='unseen') toast('No unseen questions left in this selection');
+    else toast('No questions match this selection');
+    return;
+  }
+  const scope = selected.length===state.banks.length ? 'All banks' : selected.join(', ');
+  quiz = { pool, idx:0, answers:[], answered:false, mode:ui.mode, scope };
+  show('quiz');
+  renderQuestion();
+}
+function renderQuestion() {
+  const q = quiz.pool[quiz.idx];
+  const tot = quiz.pool.length;
+  document.getElementById('prog').style.width = Math.round(quiz.idx/tot*100)+'%';
+  document.getElementById('qnum').textContent = 'Question '+(quiz.idx+1)+' of '+tot;
+  document.getElementById('qbank').textContent = q.bank;
+  const qm = document.getElementById('qmode');
+  qm.textContent = quiz.mode==='exam'?'Exam':'Study';
+  qm.className = 'chip mode-'+quiz.mode;
+  const sc = document.getElementById('qscenario');
+  if (q.scenario) { sc.textContent = q.scenario; sc.style.display='block'; } else sc.style.display='none';
+  document.getElementById('qstem').textContent = q.stem;
+  document.getElementById('qopts').innerHTML = q.options.map((o,i) => {
+    const txt = o.replace(/^[A-E][.)]\s*/,'');
+    return '<div class="opt" id="opt-'+i+'" onclick="pick('+i+')"><span class="ol">'+LETTERS[i]+'.</span><span>'+esc(txt)+'</span></div>';
+  }).join('');
+  document.getElementById('qexp').style.display='none';
+  const nb = document.getElementById('nextbtn');
+  nb.disabled = true;
+  nb.textContent = quiz.idx===tot-1 ? 'Finish' : 'Next';
+  quiz.answered = false;
+}
+function pick(i) {
+  if (quiz.answered) return;
+  quiz.answered = true;
+  const q = quiz.pool[quiz.idx];
+  const correct = i === q.correct;
+  quiz.answers.push({ id:q.id, bank:q.bank, module:q.module, correct, chosen:i, answer:q.correct });
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((el,idx) => {
+    el.classList.add('dis');
+    if (quiz.mode==='study') {
+      if (idx===q.correct) el.classList.add('correct');
+      else if (idx===i) el.classList.add('wrong');
+    } else {
+      if (idx===i) el.classList.add('picked');
+    }
+  });
+  if (quiz.mode==='study') {
+    document.getElementById('qexptext').textContent = q.explanation || 'No explanation provided.';
+    document.getElementById('qexp').style.display='block';
+  }
+  document.getElementById('nextbtn').disabled = false;
+}
+function nextQuestion() {
+  if (!quiz.answered) return;
+  quiz.idx++;
+  if (quiz.idx >= quiz.pool.length) finishSession();
+  else renderQuestion();
+}
+function quitSession() {
+  if (confirm('Quit this session? Progress in it will not be saved.')) { quiz=null; goHome(); }
+}
+function finishSession() {
+  const sc = scoreSession(quiz.answers);
+  state.sessions.push({ date:Date.now(), correct:sc.correct, total:sc.total, mode:quiz.mode, scope:quiz.scope, answers:quiz.answers });
+  persist();
+  document.getElementById('r-score').textContent = sc.score+'%';
+  document.getElementById('r-correct').textContent = sc.correct;
+  document.getElementById('r-total').textContent = sc.total;
+  const all = state.sessions.flatMap(s => s.answers);
+  const allPct = all.length? Math.round(all.filter(a=>a.correct).length/all.length*100):0;
+  document.getElementById('r-avg').textContent = allPct+'%';
+  const bd = document.getElementById('r-breakdown');
+  bd.innerHTML = Object.entries(sc.byModule).map(([m,v]) => {
+    const p = Math.round(v.c/v.t*100);
+    return '<div class="bd-item"><span style="min-width:130px;font-size:14px">'+esc(m)+'</span>'
+      + '<div class="bd-bg"><div class="bd-bar" style="width:'+p+'%"></div></div>'
+      + '<span class="bd-pct">'+p+'%</span>'
+      + '<span style="font-size:13px;color:var(--tx2);min-width:42px;text-align:right">'+v.c+'/'+v.t+'</span></div>';
+  }).join('');
+  show('results');
+}
+function showReview() {
+  const L = LETTERS;
+  document.getElementById('review-list').innerHTML = quiz.answers.map((a,i) => {
+    const q = quiz.pool.find(x => x.id===a.id);
+    const chosen = q.options[a.chosen].replace(/^[A-E][.)]\s*/,'');
+    const right = q.options[a.answer].replace(/^[A-E][.)]\s*/,'');
+    return '<div class="review-item">'
+      + '<div style="font-size:13px;color:var(--tx2);margin-bottom:6px">'+(i+1)+'. '+esc(q.bank)+' · '+esc(q.module)+'</div>'
+      + '<div style="font-size:15px;font-weight:600;margin-bottom:8px;line-height:1.45">'+esc(q.stem)+'</div>'
+      + '<div style="font-size:14px;margin-bottom:4px;color:'+(a.correct?'var(--ok-tx)':'var(--err-tx)')+'">Your answer: '+L[a.chosen]+'. '+esc(chosen)+' '+(a.correct?'✓':'✗')+'</div>'
+      + (!a.correct?'<div style="font-size:14px;color:var(--ok-tx);margin-bottom:4px">Correct: '+L[a.answer]+'. '+esc(right)+'</div>':'')
+      + (q.explanation?'<div style="font-size:13px;color:var(--tx2);margin-top:6px;line-height:1.6">'+esc(q.explanation)+'</div>':'')
+      + '</div>';
+  }).join('');
+  show('review');
+}
+function goHome() { renderHome(); show('home'); }
+
+// ---------- auto-load from hosted manifest ----------
+// When hosted (e.g. GitHub Pages), the app fetches manifest.json to discover
+// which bank files to load, then fetches each one. New questions (by id) are
+// merged in; existing ones are skipped, so updating a hosted bank file and
+// reopening the app picks up only the additions. Fails silently offline or
+// when opened as a local file — manual import still works in that case.
+async function autoLoadBanks() {
+  let manifest;
+  try {
+    const resp = await fetch('manifest.json', { cache: 'no-store' });
+    if (!resp.ok) return { attempted:false };
+    manifest = await resp.json();
+  } catch (e) {
+    return { attempted:false }; // offline, or opened as file:// — silent
+  }
+  if (!manifest || !Array.isArray(manifest.banks) || manifest.banks.length === 0) return { attempted:true, loaded:0 };
+  let totalLoaded = 0, errors = [];
+  for (const fileName of manifest.banks) {
+    try {
+      const r = await fetch(fileName, { cache: 'no-store' });
+      if (!r.ok) { errors.push(fileName+': not found ('+r.status+')'); continue; }
+      const text = await r.text();
+      const res = ingestBank(fileName, text);
+      totalLoaded += res.loaded;
+      errors = errors.concat(res.errors);
+    } catch (e) {
+      errors.push(fileName+': '+e.message);
+    }
+  }
+  if (totalLoaded > 0) { persist(); }
+  return { attempted:true, loaded: totalLoaded, errors };
+}
+
+async function refreshFromLibrary() {
+  const btn = document.getElementById('refresh-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Refreshing…'; }
+  const result = await autoLoadBanks();
+  if (btn) { btn.disabled = false; btn.textContent = 'Refresh from library'; }
+  if (!result.attempted) { toast('Library not reachable — host the app online to use this'); return; }
+  renderHome();
+  if (result.loaded > 0) toast('Added '+result.loaded+' new question'+(result.loaded===1?'':'s'));
+  else toast('Already up to date');
+  if (result.errors && result.errors.length) { console.warn('Refresh issues:', result.errors); }
+}
+
+// ---------- boot ----------
+restore();
+renderHome();
+setMode('study');
+autoLoadBanks().then(result => {
+  if (result.attempted && result.loaded > 0) {
+    renderHome();
+    toast('Loaded '+result.loaded+' new question'+(result.loaded===1?'':'s')+' from library');
+  }
+  if (result.errors && result.errors.length) console.warn('Auto-load issues:', result.errors);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "contract_001",
+    "module": "Contract Law",
+    "scenario": "A client entered into a written agreement with a builder to renovate her kitchen for £15,000, with completion by 1 March. The builder completed the work on 15 March and the client refused to pay, arguing the late completion was a repudiatory breach.",
+    "stem": "Which of the following best describes the client's legal position regarding her refusal to pay?",
+    "options": [
+      "A. She may treat the contract as discharged because any failure to meet a completion date is a repudiatory breach.",
+      "B. She may claim damages for the delay but must still pay the price, as time was not of the essence.",
+      "C. She may withhold payment entirely until the builder remedies the delay.",
+      "D. She has no remedy because the builder substantially performed.",
+      "E. She may rescind the contract for misrepresentation as to the completion date."
+    ],
+    "correct": 1,
+    "explanation": "A completion date is not automatically 'of the essence' in a contract. Absent an express term or a notice making time of the essence, late completion is a breach of an intermediate term sounding in damages only. The client must pay the price but may set off or counterclaim for losses caused by the delay."
+  },
+  {
+    "id": "contract_002",
+    "module": "Contract Law",
+    "scenario": "A supplier offered to sell 500 units to a retailer 'for £10 each, offer open until Friday'. On Wednesday the supplier sold the units to a third party. On Thursday the retailer, unaware of the sale, posted a letter of acceptance.",
+    "stem": "Which of the following best explains whether a contract was formed?",
+    "options": [
+      "A. A contract was formed because the offer was expressly stated to remain open until Friday.",
+      "B. A contract was formed under the postal rule when the retailer posted acceptance.",
+      "C. No contract was formed because the offer was revoked when the retailer acquired knowledge of the sale.",
+      "D. No contract was formed because an offer to keep an offer open is not binding without consideration, but revocation requires communication.",
+      "E. No contract was formed because the supplier's sale to a third party automatically terminated the offer regardless of communication."
+    ],
+    "correct": 3,
+    "explanation": "A promise to keep an offer open ('offer open until Friday') is not binding without consideration (no option contract). However, revocation must be communicated to be effective. Here the retailer was unaware of the sale, so the offer was not validly revoked to them. Reliable third-party communication of revocation can suffice (Dickinson v Dodds), but on these facts the retailer had no knowledge when accepting — making D the most accurate statement of the governing principles."
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "tort_001",
+    "module": "Tort Law",
+    "scenario": "A pedestrian slipped on ice on the forecourt of a petrol station and broke her wrist. The station owner had gritted the forecourt the previous evening but did not re-grit after overnight freezing temperatures returned.",
+    "stem": "On which basis is a claim against the station owner most likely to succeed?",
+    "options": [
+      "A. Under the Occupiers' Liability Act 1957, as the pedestrian was a lawful visitor owed the common duty of care.",
+      "B. Under the Occupiers' Liability Act 1984, as the pedestrian was a trespasser.",
+      "C. In negligence only, because forecourts are public highways outside the 1957 Act.",
+      "D. Under the Highways Act 1980, as the owner adopted the forecourt as highway.",
+      "E. There is no claim, as natural ice is not an occupier's responsibility."
+    ],
+    "correct": 0,
+    "explanation": "A petrol station forecourt is premises occupied by the owner, and a customer is a lawful visitor. The Occupiers' Liability Act 1957 imposes the common duty of care to take such care as is reasonable to see the visitor is reasonably safe. Whether re-gritting was required is a question of reasonableness, but the correct legal framework is the 1957 Act."
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "banks": [
+    "contract_law.json",
+    "tort_law.json"
+  ]
+}
