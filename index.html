@@ -82,6 +82,10 @@
   .opt.dis { cursor:default; }
   .exp { font-size:14px; line-height:1.65; border:0.5px solid var(--bd); border-radius:var(--r2); padding:14px 16px; margin-bottom:20px; }
   .exp-lbl { font-size:12px; font-weight:600; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+  .res-block { margin-top:12px; padding-top:12px; border-top:0.5px solid var(--bd); }
+  .res-lbl { font-size:12px; font-weight:600; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
+  .res-link { display:block; font-size:14px; color:var(--info-tx); text-decoration:none; padding:7px 11px; margin-bottom:6px; background:var(--info-bg); border-radius:var(--r); line-height:1.4; }
+  .res-link:active { opacity:.7; }
   .q-nav { display:flex; gap:9px; }
   .q-nav button { flex:1; }
   .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:20px; }
@@ -176,6 +180,7 @@
   <div class="exp" id="qexp" style="display:none">
     <div class="exp-lbl">Explanation</div>
     <div id="qexptext"></div>
+    <div id="qexpres"></div>
   </div>
   <div class="q-nav">
     <button onclick="quitSession()">Quit</button>
@@ -214,6 +219,107 @@
 const LS_KEY = 'sqe1_bank_v1';
 const LETTERS = ['A','B','C','D','E'];
 
+// Per-module default learning resources (free, reputable). Shown when a
+// question has no resources of its own. Edit freely — each entry is {label,url}.
+const MODULE_RESOURCES = {
+  'Contract Law': [
+    { label: 'BAILII — free UK case law', url: 'https://www.bailii.org/' },
+    { label: 'legislation.gov.uk — statutes', url: 'https://www.legislation.gov.uk/' }
+  ],
+  'Tort Law': [
+    { label: 'BAILII — free UK case law', url: 'https://www.bailii.org/' },
+    { label: 'legislation.gov.uk — statutes', url: 'https://www.legislation.gov.uk/' }
+  ],
+  'Land Law': [
+    { label: 'Land Registration Act 2002', url: 'https://www.legislation.gov.uk/ukpga/2002/9/contents' },
+    { label: 'BAILII — free UK case law', url: 'https://www.bailii.org/' }
+  ],
+  'Equity & Trusts': [
+    { label: 'Trustee Act 2000', url: 'https://www.legislation.gov.uk/ukpga/2000/29/contents' },
+    { label: 'BAILII — free UK case law', url: 'https://www.bailii.org/' }
+  ],
+  'Criminal Law': [
+    { label: 'CPS legal guidance', url: 'https://www.cps.gov.uk/legal-guidance' },
+    { label: 'BAILII — free UK case law', url: 'https://www.bailii.org/' }
+  ],
+  'Criminal Procedure': [
+    { label: 'Criminal Procedure Rules', url: 'https://www.justice.gov.uk/courts/procedure-rules/criminal' },
+    { label: 'CPS legal guidance', url: 'https://www.cps.gov.uk/legal-guidance' }
+  ],
+  'Dispute Resolution': [
+    { label: 'Civil Procedure Rules', url: 'https://www.justice.gov.uk/courts/procedure-rules/civil/rules' },
+    { label: 'BAILII — free UK case law', url: 'https://www.bailii.org/' }
+  ],
+  'Constitutional & Administrative Law': [
+    { label: 'legislation.gov.uk — statutes', url: 'https://www.legislation.gov.uk/' },
+    { label: 'BAILII — free UK case law', url: 'https://www.bailii.org/' }
+  ],
+  'Business Law & Practice': [
+    { label: 'Companies Act 2006', url: 'https://www.legislation.gov.uk/ukpga/2006/46/contents' },
+    { label: 'Companies House guidance', url: 'https://www.gov.uk/government/organisations/companies-house' }
+  ],
+  'Legal System & Services': [
+    { label: 'SRA Standards & Regulations', url: 'https://www.sra.org.uk/solicitors/standards-regulations/' },
+    { label: 'legislation.gov.uk — statutes', url: 'https://www.legislation.gov.uk/' }
+  ],
+  'Wills & Administration of Estates': [
+    { label: 'Wills Act 1837', url: 'https://www.legislation.gov.uk/ukpga/Will4and1Vict/7/26/contents' },
+    { label: 'HMRC — inheritance tax', url: 'https://www.gov.uk/inheritance-tax' }
+  ],
+  'Solicitors Accounts': [
+    { label: 'SRA Accounts Rules', url: 'https://www.sra.org.uk/solicitors/standards-regulations/accounts-rules/' }
+  ],
+  'Property Practice': [
+    { label: 'HM Land Registry', url: 'https://www.gov.uk/government/organisations/land-registry' },
+    { label: 'Law Society conveyancing', url: 'https://www.lawsociety.org.uk/topics/property' }
+  ],
+  'Tax': [
+    { label: 'HMRC manuals', url: 'https://www.gov.uk/government/collections/hmrc-manuals' },
+    { label: 'legislation.gov.uk — statutes', url: 'https://www.legislation.gov.uk/' }
+  ]
+};
+
+// Only allow http/https links; reject anything else (javascript:, data:, etc.)
+function safeUrl(u) {
+  if (typeof u !== 'string' || !u.trim()) return null;
+  try {
+    const parsed = new URL(u);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return u;
+  } catch (e) {}
+  return null;
+}
+
+// Normalise a resources value (from a question or a module default) into a
+// clean array of {label,url}. Bad entries are dropped, never break rendering.
+function normaliseResources(raw) {
+  if (!Array.isArray(raw)) return [];
+  const out = [];
+  for (const r of raw) {
+    if (!r || typeof r !== 'object') continue;
+    const url = safeUrl(r.url);
+    if (!url) continue;
+    const label = (typeof r.label === 'string' && r.label.trim()) ? r.label.trim() : url;
+    out.push({ label, url });
+  }
+  return out;
+}
+
+// Resources to show for a question: its own if present, else module defaults.
+function resourcesFor(q) {
+  const own = normaliseResources(q.resources);
+  if (own.length) return own;
+  return normaliseResources(MODULE_RESOURCES[q.module]);
+}
+
+// Build the HTML block of resource links (or '' if none).
+function resourcesHtml(q) {
+  const res = resourcesFor(q);
+  if (!res.length) return '';
+  return '<div class="res-block"><div class="res-lbl">Learn more</div>'
+    + res.map(r => '<a class="res-link" href="'+esc(r.url)+'" target="_blank" rel="noopener noreferrer">'+esc(r.label)+' ↗</a>').join('')
+    + '</div>';
+}
+
 let state = { questions: [], banks: [], sessions: [] };
 let ui = { selectedBanks: {}, mode: 'study' };
 let quiz = null;
@@ -247,7 +353,7 @@ function ingestBank(fileName, rawText) {
     if (!Array.isArray(q.options) || q.options.length !== 5 || !q.options.every(o => typeof o === 'string')) { result.errors.push(fileName+': '+q.id+' must have exactly 5 options, all text strings'); continue; }
     if (!Number.isInteger(q.correct) || q.correct < 0 || q.correct > 4) { result.errors.push(fileName+': '+q.id+" 'correct' must be an integer 0-4"); continue; }
     if (state.questions.some(e => e.id === q.id)) { result.skipped++; continue; }
-    state.questions.push({ id:q.id, module:q.module, scenario:q.scenario||'', stem:q.stem, options:q.options, correct:q.correct, explanation:q.explanation, bank:bankId });
+    state.questions.push({ id:q.id, module:q.module, scenario:q.scenario||'', stem:q.stem, options:q.options, correct:q.correct, explanation:q.explanation, bank:bankId, resources: Array.isArray(q.resources) ? q.resources : undefined });
     result.loaded++;
   }
   if (!state.banks.includes(bankId) && result.loaded > 0) state.banks.push(bankId);
@@ -476,6 +582,7 @@ function pick(i) {
   });
   if (quiz.mode==='study') {
     document.getElementById('qexptext').textContent = q.explanation || 'No explanation provided.';
+    document.getElementById('qexpres').innerHTML = resourcesHtml(q);
     document.getElementById('qexp').style.display='block';
   }
   document.getElementById('nextbtn').disabled = false;
@@ -521,6 +628,7 @@ function showReview() {
       + '<div style="font-size:14px;margin-bottom:4px;color:'+(a.correct?'var(--ok-tx)':'var(--err-tx)')+'">Your answer: '+L[a.chosen]+'. '+esc(chosen)+' '+(a.correct?'✓':'✗')+'</div>'
       + (!a.correct?'<div style="font-size:14px;color:var(--ok-tx);margin-bottom:4px">Correct: '+L[a.answer]+'. '+esc(right)+'</div>':'')
       + (q.explanation?'<div style="font-size:13px;color:var(--tx2);margin-top:6px;line-height:1.6">'+esc(q.explanation)+'</div>':'')
+      + resourcesHtml(q)
       + '</div>';
   }).join('');
   show('review');

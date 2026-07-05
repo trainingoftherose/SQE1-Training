@@ -12,6 +12,9 @@
       "E. There is no claim, as natural ice is not an occupier's responsibility."
     ],
     "correct": 0,
-    "explanation": "A petrol station forecourt is premises occupied by the owner, and a customer is a lawful visitor. The Occupiers' Liability Act 1957 imposes the common duty of care to take such care as is reasonable to see the visitor is reasonably safe. Whether re-gritting was required is a question of reasonableness, but the correct legal framework is the 1957 Act."
+    "explanation": "A petrol station forecourt is premises occupied by the owner, and a customer is a lawful visitor. The Occupiers' Liability Act 1957 imposes the common duty of care to take such care as is reasonable to see the visitor is reasonably safe. Whether re-gritting was required is a question of reasonableness, but the correct legal framework is the 1957 Act.",
+    "resources": [
+      { "label": "Occupiers' Liability Act 1957", "url": "https://www.legislation.gov.uk/ukpga/Eliz2/5-6/31/contents" }
+    ]
   }
 ]

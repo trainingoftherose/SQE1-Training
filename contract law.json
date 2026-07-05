@@ -12,7 +12,11 @@
       "E. She may rescind the contract for misrepresentation as to the completion date."
     ],
     "correct": 1,
-    "explanation": "A completion date is not automatically 'of the essence' in a contract. Absent an express term or a notice making time of the essence, late completion is a breach of an intermediate term sounding in damages only. The client must pay the price but may set off or counterclaim for losses caused by the delay."
+    "explanation": "A completion date is not automatically 'of the essence' in a contract. Absent an express term or a notice making time of the essence, late completion is a breach of an intermediate term sounding in damages only. The client must pay the price but may set off or counterclaim for losses caused by the delay.",
+    "resources": [
+      { "label": "Sale of Goods Act 1979 s.10 (time of payment)", "url": "https://www.legislation.gov.uk/ukpga/1979/54/section/10" },
+      { "label": "BAILII — search 'time of the essence'", "url": "https://www.bailii.org/" }
+    ]
   },
   {
     "id": "contract_002",
@@ -27,6 +31,9 @@
       "E. No contract was formed because the supplier's sale to a third party automatically terminated the offer regardless of communication."
     ],
     "correct": 3,
-    "explanation": "A promise to keep an offer open ('offer open until Friday') is not binding without consideration (no option contract). However, revocation must be communicated to be effective. Here the retailer was unaware of the sale, so the offer was not validly revoked to them. Reliable third-party communication of revocation can suffice (Dickinson v Dodds), but on these facts the retailer had no knowledge when accepting — making D the most accurate statement of the governing principles."
+    "explanation": "A promise to keep an offer open ('offer open until Friday') is not binding without consideration (no option contract). However, revocation must be communicated to be effective. Here the retailer was unaware of the sale, so the offer was not validly revoked to them. Reliable third-party communication of revocation can suffice (Dickinson v Dodds), but on these facts the retailer had no knowledge when accepting — making D the most accurate statement of the governing principles.",
+    "resources": [
+      { "label": "Dickinson v Dodds (1876) on BAILII", "url": "https://www.bailii.org/" }
+    ]
   }
 ]
